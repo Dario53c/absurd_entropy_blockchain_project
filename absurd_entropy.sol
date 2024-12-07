@@ -8,6 +8,10 @@ contract absurd_entropy{
         bool VIP;
     }
 
+    uint256 public constant NUMBER_PAYOUT = 36; 
+    uint256 public constant COLOR_PAYOUT = 2;
+    uint256 public constant BLACKJACK_PAYOUT = 3; 
+
     mapping(address => User) public Customers;
     address public owner;
 
@@ -22,8 +26,25 @@ contract absurd_entropy{
         _;
     }
 
+
+    mapping(uint8 => string) public numberToColor; //this is basiacly the roulette wheel
     constructor() {
         owner = msg.sender;
+
+        // assigning colors to the roulette wheel here
+        for (uint8 i = 1; i <= 36; i++) {
+            if (
+                i == 1 || i == 3 || i == 5 || i == 7 || i == 9 ||
+                i == 12 || i == 14 || i == 16 || i == 18 || i == 19 ||
+                i == 21 || i == 23 || i == 25 || i == 27 || i == 30 ||
+                i == 32 || i == 34 || i == 36
+            ) {
+                numberToColor[i] = "red";
+            } else {
+                numberToColor[i] = "black";
+            }
+        }
+        numberToColor[0] = "green";
     }
 
     function registerUser(string memory username) public {
@@ -173,4 +194,8 @@ contract absurd_entropy{
     function getScores() external view returns (uint8, uint8) {
         return (playerScore, houseScore);
     }
+
+    //roulette part ------------------------------------------------------------------------------
+
+
 }
