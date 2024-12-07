@@ -40,6 +40,24 @@ contract absurd_entropy{
     uint8[] private deck;
     uint256 private deckIndex;
 
+    event CardDealt(address indexed recipient, uint8 card);
+    event GameEnded(address indexed winner);
+    
+    modifier gameIsStarted() {
+        require(gameStarted, "The game has not started yet");
+        _;
+    }
+
+    modifier gameNotStarted() {
+        require(!gameStarted, "The game is already started");
+        _;
+    }
+
+    function joinGame() external gameNotStarted onlyCustomer{
+        player = msg.sender;
+        startGame();
+    }
+
      // initialize deck and clear variables
     function initializeDeck() internal {
         delete deck;
@@ -57,5 +75,29 @@ contract absurd_entropy{
             uint256 randomIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, i))) % deck.length;
             (deck[i], deck[randomIndex]) = (deck[randomIndex], deck[i]);
         }
+    }
+
+
+
+
+
+
+
+
+
+    //testing functions
+    // get plazer hand
+    function getPlayerHand() external view returns (uint8[] memory) {
+        return playerHand;
+    }
+
+    // get house hand
+    function getHouseHand() external view returns (uint8[] memory) {
+        return houseHand;
+    }
+
+    // get scores
+    function getScores() external view returns (uint8 player, uint8 house) {
+        return (playerScore, houseScore);
     }
 }
