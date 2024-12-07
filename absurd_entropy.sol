@@ -16,6 +16,12 @@ contract absurd_entropy{
         _;
     }
 
+    modifier onlyCustomer() {
+        if(!isCustomer[msg.sender]){
+        revert("Only a customer can call this function");}
+        _;
+    }
+    
     constructor() {
         owner = msg.sender;
     }
@@ -162,7 +168,7 @@ contract absurd_entropy{
     }
 
     // get scores
-    function getScores() external view returns (uint8 player, uint8 house) {
+    function getScores() external view returns (uint8, uint8) {
         return (playerScore, houseScore);
     }
 }
