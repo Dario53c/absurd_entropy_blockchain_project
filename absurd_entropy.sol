@@ -78,6 +78,33 @@ contract absurd_entropy{
     }
 
 
+    function startGame() internal{
+
+        initializeDeck();
+
+        dealCard(playerHand, true);
+        dealCard(playerHand, true);
+        dealCard(houseHand, false);
+        dealCard(houseHand, false); 
+
+        gameStarted = true;
+    }
+
+
+    function dealCard(uint8[] storage _hand, bool isPlayer) internal {
+        require(deckIndex < deck.length, "No more cards in the deck");
+
+        uint8 card = deck[deckIndex];
+        _hand.push(card);
+        deckIndex++;
+
+        if (isPlayer) {
+            playerScore += cardValue(card);
+        } else {
+            houseScore += cardValue(card);
+            if (_hand.length == 1) emit CardDealt(address(this), card); // onlz the first card should be visible
+        }
+    }
 
 
 
