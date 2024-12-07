@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Gambling</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Absurd Entropy</h1>
+
+
+        <div id="games">
+            <h2>Play Blackjack</h2>
+            <input type="number" id="blackjack-bet" placeholder="Enter bet amount in ETH">
+            <button onclick="playBlackjack()">Play Blackjack</button>
+            <p id="blackjack-result"></p>
+
+            <h2>Play Roulette</h2>
+            <input type="number" id="roulette-bet" placeholder="Enter bet amount in ETH">
+            <select id="roulette-color">
+                <option value="red">Red</option>
+                <option value="black">Black</option>
+                <option value="green">Green</option>
+            </select>
+            <button onclick="spinRoulette()">Spin Roulette</button>
+            <p id="roulette-result"></p>
+        </div>
+
+        <div id="balance">
+            <p id="user-balance">Balance: 0 ETH</p>
+        </div>
+
+        <div id="withdraw">
+            <button onclick="withdrawWinnings()">Withdraw Winnings</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

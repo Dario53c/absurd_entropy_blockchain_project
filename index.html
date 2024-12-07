@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.2.2/web3.min.js"></script>
+
+</head>
+<body>
+    
+    <p>Please login using your MetaMask Account</p>
+    <button id="connectToMetamask">Connect to MetaMask</button>
+    <p id="address" style="display: none;">Connected Address: <span id="connectedAddress"></span></p>
+
+    <script>
+        $("#connectToMetamask").click(async function() {
+            if (window.ethereum) {
+                let addresses = await window.ethereum.request({method: 'eth_requestAccounts'});
+                window.web3 = new Web3( window.ethereum );
+                console.log(addresses);
+
+                $("#connectToMetamask").hide();
+                $("#address").css('display','block');
+                $("#connectedAddress").html(addresses[0]);
+            }
+        });
+    </script>
+</body>
+</html>
