@@ -77,6 +77,13 @@ contract absurd_entropy{
         }
     }
 
+    // convert value of card, and also make sure the pictures are worth 10
+    function cardValue(uint8 _card) internal pure returns (uint8) {
+        uint8 value = _card % 13 + 1;
+        if (value > 10) return 10;
+        return value;
+    }
+
 
     function startGame() internal{
 
@@ -106,7 +113,25 @@ contract absurd_entropy{
         }
     }
 
+    // hit
+    function hit() external onlyCustomer gameIsStarted {
+        require(playerScore < 21, "Cannot hit, your score is 21 or above");
+        dealCard(playerHand, true);
+        if (playerScore > 21) endGame(); // bust
+    }
 
+    // stand
+    function stand() external onlyCustomer gameIsStarted {
+        houseTurn();
+        endGame();
+    }
+
+    // house logic (simple i know)
+    function houseTurn() internal {
+        while (houseScore < 17) {
+            dealCard(houseHand, false);
+        }
+    }
 
 
 
