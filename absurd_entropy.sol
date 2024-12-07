@@ -133,7 +133,20 @@ contract absurd_entropy{
         }
     }
 
+    function endGame() internal {
+        gameStarted = false;
 
+        address winner;
+        if (playerScore > 21) {
+            winner = address(this); // if player busts, house wins
+        } else if (houseScore > 21 || playerScore > houseScore) {
+            winner = player; // player wins
+        } else if (houseScore > playerScore) {
+            winner = address(this); // house wins
+        }
+
+        emit GameEnded(winner);
+    }
 
 
 
