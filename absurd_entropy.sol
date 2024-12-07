@@ -21,7 +21,7 @@ contract absurd_entropy{
         revert("Only a customer can call this function");}
         _;
     }
-    
+
     constructor() {
         owner = msg.sender;
     }
@@ -123,7 +123,7 @@ contract absurd_entropy{
     function hit() external onlyCustomer gameIsStarted {
         require(playerScore < 21, "Cannot hit, your score is 21 or above");
         dealCard(playerHand, true);
-        if (playerScore > 21) endGame(); // bust
+        if (playerScore >= 21) endGame(); // bust or perfect blackjack
     }
 
     // stand
@@ -147,7 +147,9 @@ contract absurd_entropy{
             winner = address(this); // if player busts, house wins
         } else if (houseScore > 21 || playerScore > houseScore) {
             winner = player; // player wins
-        } else if (houseScore > playerScore) {
+        }else if(playerScore == houseScore){
+            winner = address(0x00); //draw
+        }else if (houseScore > playerScore) {
             winner = address(this); // house wins
         }
 
