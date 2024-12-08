@@ -239,6 +239,18 @@ contract absurd_entropy{
         }
     }
 
-     
+    //these are mainly testing functions--------------------------------------------------------------
+    
+    function depositFunds() external payable onlyOwner{}
+
+    // withdraw some money for myself
+    function withdrawFunds(uint256 _amount) external onlyOwner{
+        require(address(this).balance >= _amount, "Insufficient contract balance");
+        payable(owner).transfer(_amount);
+    }
+
+    function getBalance() external view  onlyOwner returns (uint256){
+        return address(this).balance;
+    }
 }
    
