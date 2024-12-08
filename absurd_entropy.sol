@@ -8,7 +8,7 @@ contract absurd_entropy{
         bool VIP;
     }
 
-    uint256 public constant NUMBER_PAYOUT = 36; 
+    uint256 public constant NUMBER_PAYOUT = 15; 
     uint256 public constant COLOR_PAYOUT = 2;
     uint256 public constant BLACKJACK_PAYOUT = 3; 
 
@@ -85,6 +85,9 @@ contract absurd_entropy{
     }
 
     function joinGame() external gameNotStarted onlyCustomer payable{
+        if(address(this).balance <= msg.value * 15){
+                revert("Contract does not have enough funds to pay out");
+            }
         player = msg.sender;
         placedBet[msg.sender] = msg.value;
         startGame();
@@ -185,12 +188,13 @@ contract absurd_entropy{
             winner = address(this); // house wins
         }
 
-        placedBet[msg.sender] = 0x00;
+        
         if (payout > 0) {
-            require(address(this).balance >= payout, "Contract does not have enough funds to pay out");
+            
             payable(msg.sender).transfer(payout);
             emit Payout(msg.sender, payout);
         }
+        placedBet[msg.sender] = 0x00;
         emit GameEnded(winner);
     }
 
@@ -221,6 +225,9 @@ contract absurd_entropy{
     
     function placeBetAndSPinWheel(uint8 _number, string memory _color) external payable onlyCustomer{
         require(msg.value > 0, "Bet amount must be greater than 0");
+        if(address(this).balance <= msg.value * 15){
+                revert("Contract does not have enough funds to pay out");
+            }
         require(_number <= 36, "Invalid number, must be between 0 and 36");
         require(
             keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked("red")) ||
