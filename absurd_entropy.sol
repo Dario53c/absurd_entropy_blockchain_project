@@ -15,6 +15,7 @@ contract absurd_entropy{
 
     mapping(address => User) public Customers;
     mapping(address => bool) public isCustomer;
+    mapping(address => uint256) public placedBet;
     address public owner;
 
     modifier onlyOwner() {
@@ -83,8 +84,9 @@ contract absurd_entropy{
         _;
     }
 
-    function joinGame() external gameNotStarted onlyCustomer{
+    function joinGame() external gameNotStarted onlyCustomer payable{
         player = msg.sender;
+        placedBet[msg.sender] = msg.value;
         startGame();
     }
 
@@ -165,18 +167,30 @@ contract absurd_entropy{
 
     function endGame() internal {
         gameStarted = false;
+        uint256 payout = 0;
 
         address winner;
         if (playerScore > 21) {
             winner = address(this); // if player busts, house wins
         } else if (houseScore > 21 || playerScore > houseScore) {
-            winner = player; // player wins
+            winner = player;
+            if(Customers[msg.sender].VIP){
+                payout = placedBet[msg.sender] * BLACKJACK_PAYOUT * 2;
+            }else{
+            payout = placedBet[msg.sender] * BLACKJACK_PAYOUT;} // player wins
         }else if(playerScore == houseScore){
             winner = address(0x00); //draw
+            payout = placedBet[msg.sender];
         }else if (houseScore > playerScore) {
             winner = address(this); // house wins
         }
 
+        placedBet[msg.sender] = 0x00;
+        if (payout > 0) {
+            require(address(this).balance >= payout, "Contract does not have enough funds to pay out");
+            payable(msg.sender).transfer(payout);
+            emit Payout(msg.sender, payout);
+        }
         emit GameEnded(winner);
     }
 
