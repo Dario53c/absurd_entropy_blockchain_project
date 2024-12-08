@@ -12,7 +12,9 @@ contract absurd_entropy{
     uint256 public constant COLOR_PAYOUT = 2;
     uint256 public constant BLACKJACK_PAYOUT = 3; 
 
+
     mapping(address => User) public Customers;
+    mapping(address => bool) public isCustomer;
     address public owner;
 
     modifier onlyOwner() {
@@ -26,12 +28,11 @@ contract absurd_entropy{
         _;
     }
 
-
     mapping(uint8 => string) public numberToColor; //this is basiacly the roulette wheel
     constructor() {
         owner = msg.sender;
 
-        // assigning colors to the roulette wheel here
+         // assigning colors to the roulette wheel here
         for (uint8 i = 1; i <= 36; i++) {
             if (
                 i == 1 || i == 3 || i == 5 || i == 7 || i == 9 ||
@@ -45,6 +46,7 @@ contract absurd_entropy{
             }
         }
         numberToColor[0] = "green";
+    
     }
 
     function registerUser(string memory username) public {
@@ -56,7 +58,8 @@ contract absurd_entropy{
         Customers[adresa].VIP = true;
     } 
 
-//blackjack logic----------------------------------------------------------------------
+
+    //blackjack logic----------------------------------------------------------------------
 
     uint8[] public playerHand;
     uint8[] public houseHand;
@@ -197,5 +200,45 @@ contract absurd_entropy{
 
     //roulette part ------------------------------------------------------------------------------
 
+    event BetPlaced(address indexed player, uint256 amount, uint8 number, string color);
+    event SpinResult(uint8 number, string color);
+    event Payout(address indexed player, uint256 amount);
 
+    
+    function placeBetAndSPinWheel(uint8 _number, string memory _color) external payable onlyCustomer{
+        require(msg.value > 0, "Bet amount must be greater than 0");
+        require(_number <= 36, "Invalid number, must be between 0 and 36");
+        require(
+            keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked("red")) ||
+            keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked("black")) ||
+            keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked("")),
+            "Invalid color, must be 'red', 'black', or empty"
+        );//iz nekog razloga stringovi se jedino ovako mogu compareat
+
+        emit BetPlaced(msg.sender, msg.value, _number, _color);
+
+        uint256 playerBet = msg.value;
+        uint256 payout = 0;
+
+        // simulate spin
+        uint8 winningNumber = uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % 37);
+        string memory winningColor = numberToColor[winningNumber];
+
+        emit SpinResult(winningNumber, winningColor);
+
+        if (_number == winningNumber) {
+            payout = playerBet * NUMBER_PAYOUT;
+        } else if (keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked(winningColor))) {
+            payout = playerBet * COLOR_PAYOUT;
+        }
+
+        if (payout > 0) {
+            require(address(this).balance >= payout, "Contract does not have enough funds to pay out");
+            payable(msg.sender).transfer(payout);
+            emit Payout(msg.sender, payout);
+        }
+    }
+
+     
 }
+   
