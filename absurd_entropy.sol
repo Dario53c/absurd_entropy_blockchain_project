@@ -227,9 +227,15 @@ contract absurd_entropy{
         emit SpinResult(winningNumber, winningColor);
 
         if (_number == winningNumber) {
-            payout = playerBet * NUMBER_PAYOUT;
+            if(Customers[msg.sender].VIP){
+                payout = playerBet * NUMBER_PAYOUT * 2;
+            }else{
+            payout = playerBet * NUMBER_PAYOUT;}
         } else if (keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked(winningColor))) {
-            payout = playerBet * COLOR_PAYOUT;
+            if(Customers[msg.sender].VIP){
+                payout = playerBet * COLOR_PAYOUT * 2;
+            }else{
+            payout = playerBet * COLOR_PAYOUT;}
         }
 
         if (payout > 0) {
