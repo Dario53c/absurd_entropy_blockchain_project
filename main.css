@@ -52,3 +52,41 @@ input, select {
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+#becomeVIP {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff416c, #ff4b2b); /* Gradient colors */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4); /* Initial glow effect */
+}
+
+/* Hover Effect */
+#becomeVIP:hover {
+    transform: scale(1.1); /* Slightly larger on hover */
+    background: linear-gradient(45deg, #ff6a95, #ff4b2b); /* Lighter gradient */
+    box-shadow: 0 8px 20px rgba(255, 75, 43, 0.6); /* Brighter glow */
+}
+
+/* Focused Effect (Keyboard users) */
+#becomeVIP:focus {
+    outline: none;
+    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.8);
+}
+
+/* Button in the VIP Section */
+#vip-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#username {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}

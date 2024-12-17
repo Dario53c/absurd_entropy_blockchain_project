@@ -50,9 +50,14 @@ contract absurd_entropy{
     
     }
 
+    function checkUserExist(address _address) public view returns (bool){
+        return isCustomer[_address];
+    }
+
     function registerUser(string memory username) public {
-        Customers[msg.sender] = User(msg.sender, username, false);
-        isCustomer[msg.sender] = true;
+
+            Customers[msg.sender] = User(msg.sender, username, false);
+            isCustomer[msg.sender] = true;
     }
 
     function MakeVIP(address adresa) public onlyOwner{
