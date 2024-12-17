@@ -24,10 +24,12 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
 button:hover {
     background: #218838;
+    transform: scale(1.1);
 }
 
 input, select {
@@ -36,4 +38,17 @@ input, select {
     width: calc(100% - 24px);
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+#address, #games {
+
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+}
+
+/* Class to make elements visible with fade-in */
+.fade-in {
+
+    visibility: visible !important;
+    opacity: 1 !important;
 }
