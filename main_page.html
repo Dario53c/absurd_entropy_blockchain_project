@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Gambling</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <link rel="stylesheet" href="main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.2.2/web3.min.js"></script>
@@ -12,20 +11,30 @@
 <body>
     <div class="container">
         <h1>Absurd Entropy</h1>
-        <p>Please login using your MetaMask Account</p>
+        <p id="loginParagraph">Please login using your MetaMask Account</p>
         <button id="connectToMetamask">Connect to MetaMask</button>
-        <p id="address">Connected Address: <span id="connectedAddress"></span></p>
+        <p id="address">Connected User: <span id="connectedAddress"></span></p>
 
-        <div id="username">
-            <input type="text" placeholder="Enter your username">
+
+
+        <!-- Username Section -->
+        <div id="username" style="display:none;">
+            <input id="userName" type="text" placeholder="Enter your username">
+            <button id="setUsername">Set Username</button>
         </div>
 
+
+        <!-- Games Section -->
         <div id="games">
+
+            <!-- Blackjack -->
             <h2>Play Blackjack</h2>
             <input type="number" id="blackjack-bet" placeholder="Enter bet amount in ETH">
             <button onclick="playBlackjack()">Play Blackjack</button>
             <p id="blackjack-result"></p>
 
+
+            <!-- Roulette -->
             <h2>Play Roulette</h2>
             <input type="number" id="roulette-bet" placeholder="Enter bet amount in ETH">
             <select id="roulette-color">
@@ -45,19 +54,18 @@
             <div id="vip-section">
                 <button id="becomeVIP">Become VIP</button>
             </div>
-            
         </div>
-
-        
     </div>
-    <script src="app.js"></script>
-
         
     <script>
         var userAddress;
-        const address = "0x0cC3342871840e48A7023e5FC63f70c0cEf52fA9";
-        const abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"number","type":"uint8"},{"indexed":false,"internalType":"string","name":"color","type":"string"}],"name":"BetPlaced","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint8","name":"card","type":"uint8"}],"name":"CardDealt","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"}],"name":"GameEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Payout","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"number","type":"uint8"},{"indexed":false,"internalType":"string","name":"color","type":"string"}],"name":"SpinResult","type":"event"},{"inputs":[],"name":"BLACKJACK_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"COLOR_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"Customers","outputs":[{"internalType":"address","name":"walletAdress","type":"address"},{"internalType":"string","name":"username","type":"string"},{"internalType":"bool","name":"VIP","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"adresa","type":"address"}],"name":"MakeVIP","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"NUMBER_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"depositFunds","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"gameStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getHouseHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPlayerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getScores","outputs":[{"internalType":"uint8","name":"","type":"uint8"},{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"houseHand","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"houseScore","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isCustomer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"joinGame","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"numberToColor","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"_number","type":"uint8"},{"internalType":"string","name":"_color","type":"string"}],"name":"placeBetAndSPinWheel","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"placedBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"player","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerHand","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"playerScore","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"stand","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+        window.web3 = new Web3(window.ethereum);
+        const address = "0x72e61FE1886b4F22dB1335B2f7072C04A4bB3AD0";
+        const abi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint8","name":"number","type":"uint8"},{"indexed":false,"internalType":"string","name":"color","type":"string"}],"name":"BetPlaced","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"recipient","type":"address"},{"indexed":false,"internalType":"uint8","name":"card","type":"uint8"}],"name":"CardDealt","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"winner","type":"address"}],"name":"GameEnded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"player","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Payout","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"number","type":"uint8"},{"indexed":false,"internalType":"string","name":"color","type":"string"}],"name":"SpinResult","type":"event"},{"inputs":[],"name":"BLACKJACK_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"COLOR_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"Customers","outputs":[{"internalType":"address","name":"walletAdress","type":"address"},{"internalType":"string","name":"username","type":"string"},{"internalType":"bool","name":"VIP","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"adresa","type":"address"}],"name":"MakeVIP","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"NUMBER_PAYOUT","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"checkUserExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"depositFunds","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"gameStarted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getBalance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getHouseHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getPlayerHand","outputs":[{"internalType":"uint8[]","name":"","type":"uint8[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getScores","outputs":[{"internalType":"uint8","name":"","type":"uint8"},{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"hit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"houseHand","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"houseScore","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isCustomer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"joinGame","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint8","name":"","type":"uint8"}],"name":"numberToColor","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"_number","type":"uint8"},{"internalType":"string","name":"_color","type":"string"}],"name":"placeBetAndSPinWheel","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"placedBet","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"player","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"playerHand","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"playerScore","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"username","type":"string"}],"name":"registerUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"stand","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawFunds","outputs":[],"stateMutability":"nonpayable","type":"function"}];
         const contract = new web3.eth.Contract(abi, address);
+
+
+        // Connect to Metamask
         $("#connectToMetamask").click(async function() {
             if (window.ethereum) {
                 
@@ -66,22 +74,65 @@
                 console.log(addresses);
 
                 $("#connectToMetamask").hide();
-
-                $("#username").addClass('fade-in');
-                $("#address").addClass('fade-in');
-                $("#games").addClass('fade-in');
-
+                console.log(await contract.methods.isCustomer(addresses[0]).call());
+                if(!await contract.methods.isCustomer(addresses[0]).call()){
+                    $("#username").addClass('fade-in');
+                    
+                } else {        
+                    $("#address").addClass('fade-in');
+                    $("#games").addClass('fade-in');
+                    $("#userName").css('display', 'none');
+                    $("#setUsername").css('display', 'none');
+                    $("#loginParagraph").css('display', 'none');
                 userAddress = addresses[0];
-             
-                $("#connectedAddress").html(userAddress);
-                console.log(userAddress);
-                console.log(abi);
+
+                const user = await contract.methods.Customers(addresses[0]).call();
+                console.log(user.username);
+                $("#connectedAddress").html("<b>" + user.username + "</b>");
             }
+        }
+        });
+
+
+        // Setting the username
+        $("#setUsername").click(async function() {
+
+            const username = document.getElementById("userName").value;
+            if (username==""){
+                    alert("Please enter a username");
+                    return;
+            }
+            userAddress = addresses[0];
+            await contract.methods.registerUser(username).send({from: userAddress});
+            $("#address").addClass('fade-in');
+            $("#games").addClass('fade-in');
+            $("#userName").css('display', 'none');
+            $("#setUsername").css('display', 'none');
+            $("#loginParagraph").css('display', 'none');
+            
+            $("#connectedAddress").html("<b>" + username + "</b>");
+        });
+
+
+        // Become VIP
+        $("#becomeVIP").click(async function() {
+            await contract.methods.MakeVIP(userAddress).send({from: userAddress});
         });
 
         function playBlackjack() {
-            const contract = new web3.eth.Contract(abi, address);
             const betAmount = document.getElementById("blackjack-bet").value;
+            if (betAmount==""){
+                    alert("Please enter a bet amount");
+                    return;
+            }
+            contract.methods.joinGame().send({from: userAddress});
+            contract.methods.startGame().send({from: userAddress});
+
+            const playerHand = contract.methods.getPlayerHand().call();
+            const houseHand = contract.methods.getHouseHand().call();
+
+            console.log(playerHand);
+            console.log(houseHand);
         }
     </script>
 </body>
