@@ -60,7 +60,7 @@ contract absurd_entropy{
             isCustomer[msg.sender] = true;
     }
 
-    function MakeVIP(address adresa) public onlyOwner{
+    function MakeVIP(address adresa) public {
         Customers[adresa].VIP = true;
     } 
 
@@ -89,7 +89,7 @@ contract absurd_entropy{
         _;
     }
 
-    function joinGame() external gameNotStarted onlyCustomer payable{
+    function joinGame() external gameNotStarted payable{
         if(address(this).balance <= msg.value * 15){
                 revert("Contract does not have enough funds to pay out");
             }
@@ -125,7 +125,7 @@ contract absurd_entropy{
     }
 
 
-    function startGame() internal{
+    function startGame() internal {
 
         initializeDeck();
 
@@ -154,14 +154,14 @@ contract absurd_entropy{
     }
 
     // hit
-    function hit() external onlyCustomer gameIsStarted {
+    function hit() external gameIsStarted {
         require(playerScore < 21, "Cannot hit, your score is 21 or above");
         dealCard(playerHand, true);
         if (playerScore >= 21) endGame(); // bust or perfect blackjack
     }
 
     // stand
-    function stand() external onlyCustomer gameIsStarted {
+    function stand() external gameIsStarted {
         houseTurn();
         endGame();
     }
@@ -227,8 +227,10 @@ contract absurd_entropy{
     event SpinResult(uint8 number, string color);
     event Payout(address indexed player, uint256 amount);
 
+    bool winner = false;
     
-    function placeBetAndSPinWheel(uint8 _number, string memory _color) external payable onlyCustomer{
+    function placeBetAndSPinWheel(uint8 _number, string memory _color) external payable {
+        winner = false;
         require(msg.value > 0, "Bet amount must be greater than 0");
         if(address(this).balance <= msg.value * 15){
                 revert("Contract does not have enough funds to pay out");
@@ -255,13 +257,16 @@ contract absurd_entropy{
         if (_number == winningNumber) {
             if(Customers[msg.sender].VIP){
                 payout = playerBet * NUMBER_PAYOUT * 2;
+                
             }else{
             payout = playerBet * NUMBER_PAYOUT;}
+            winner=true;
         } else if (keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked(winningColor))) {
             if(Customers[msg.sender].VIP){
                 payout = playerBet * COLOR_PAYOUT * 2;
             }else{
             payout = playerBet * COLOR_PAYOUT;}
+            winner=true;
         }
 
         if (payout > 0) {
@@ -271,17 +276,21 @@ contract absurd_entropy{
         }
     }
 
+    function getRouletteWinner() external view returns (string boolean){ {
+        return winner;
+    }
+
     //these are mainly testing functions--------------------------------------------------------------
     
-    function depositFunds() external payable onlyOwner{}
+    function depositFunds() external payable {}
 
     // withdraw some money for myself
-    function withdrawFunds(uint256 _amount) external onlyOwner{
+    function withdrawFunds(uint256 _amount) external{
         require(address(this).balance >= _amount, "Insufficient contract balance");
         payable(owner).transfer(_amount);
     }
 
-    function getBalance() external view  onlyOwner returns (uint256){
+    function getBalance() external view returns (uint256){
         return address(this).balance;
     }
 }

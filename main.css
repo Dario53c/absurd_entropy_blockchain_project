@@ -91,3 +91,15 @@ input, select {
     opacity: 0;
     transition: opacity 0.8s ease-in-out;
 }
+
+#displayNone {
+    display:none;
+}
+
+.bett {
+    display: block; /* Make it a block-level element */
+    margin: 0 auto; /* Center horizontally */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width:70%;
+}
