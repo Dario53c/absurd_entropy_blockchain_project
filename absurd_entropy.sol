@@ -276,7 +276,7 @@ contract absurd_entropy{
         }
     }
 
-    function getRouletteWinner() external view returns (string boolean){ {
+    function getRouletteWinner() external view returns (bool) {
         return winner;
     }
 
