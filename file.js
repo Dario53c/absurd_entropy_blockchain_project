@@ -29,7 +29,12 @@ $("#connectToMetamask").click(async function() {
 
         const user = await contract.methods.Customers(addresses[0]).call();
         console.log(user.username);
-        $("#connectedAddress").html("<b>" + user.username + "</b>");
+        
+        if (user.VIP) {
+            $("#connectedAddress").html("<b>" + user.username + " VIP</b>");
+        } else {
+            $("#connectedAddress").html("<b>" + user.username + "</b>");
+        }
         const balance = await contract.methods.getBalance().call({ from: userAddress });
         const formattedBalance = Web3.utils.fromWei(balance, 'ether');
         console.log(balance);
