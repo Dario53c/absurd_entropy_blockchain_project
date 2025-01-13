@@ -233,27 +233,38 @@ houseHandFormatted = houseHand.join(", ")
 
 async function spinRoulette() {
     const betAmount = document.getElementById("roulette-bet").value;
-    if (betAmount==""){
-            alert("Please enter a bet amount");
-            return;
+    if (betAmount === "") {
+        alert("Please enter a bet amount");
+        return;
     }
+
     document.getElementById("roulette-result").textContent = "Spinning...";
     const color = document.getElementById("roulette-color").value;
-    if(color=="green"){
-        color="";
-    }
     const number = document.getElementById("roulette-number").value;
-    await contract.methods.placeBetAndSPinWheel(number, color).call({from: userAddress,
-        value: betAmount});
+    const formattedColor = color === "green" ? "" : color; // Format color for contract
 
-    const balance = await contract.methods.getBalance().call({ from: userAddress });
-    console.log(balance);
-    document.getElementById("user-balance").textContent = `Balance: ${web3.utils.fromWei(balance, "ether")} ETH`;
+    try {
+        // Execute the transaction
+        await contract.methods.placeBetAndSPinWheel(number, formattedColor).send({
+            from: userAddress,
+            value: web3.utils.toWei(betAmount, "ether"), // Convert bet amount to Wei
+        });
 
-    if(await contract.methods.getRouletteWinner().call({ from: userAddress })){
-        document.getElementById("roulette-result").textContent = "You won!";
-    } else {
-        document.getElementById("roulette-result").textContent = "You lost!";
+        // Fetch the updated balance
+        const balance = await contract.methods.getBalance().call({ from: userAddress });
+        document.getElementById("user-balance").textContent = `Balance: ${web3.utils.fromWei(balance, "ether")} ETH`;
+
+        // Check if the player won or lost
+        const didWin = await contract.methods.getRouletteWinner().call({ from: userAddress });
+        if (didWin) {
+            document.getElementById("roulette-result").textContent = "You won!";
+        } else {
+            document.getElementById("roulette-result").textContent = "You lost!";
+        }
+    } catch (error) {
+        console.error("Error spinning roulette:", error);
+        document.getElementById("roulette-result").textContent = "Error occurred. Please try again.";
     }
 }
+
 
