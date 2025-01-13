@@ -18,16 +18,7 @@ contract absurd_entropy{
     mapping(address => uint256) public placedBet;
     address public owner;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only the owner can call this function");
-        _;
-    }
 
-    modifier onlyCustomer() {
-        if(!isCustomer[msg.sender]){
-        revert("Only a customer can call this function");}
-        _;
-    }
 
     mapping(uint8 => string) public numberToColor; //this is basiacly the roulette wheel
     constructor() {
@@ -71,25 +62,15 @@ contract absurd_entropy{
     uint8[] public houseHand;
     uint8 public playerScore;
     uint8 public houseScore;
-    bool public gameStarted = false;
     address public player;
     uint8[] private deck;
     uint256 private deckIndex;
 
     event CardDealt(address indexed recipient, uint8 card);
-    event GameEnded(address indexed winner);
     
-    modifier gameIsStarted() {
-        require(gameStarted, "The game has not started yet");
-        _;
-    }
 
-    modifier gameNotStarted() {
-        require(!gameStarted, "The game is already started");
-        _;
-    }
 
-    function joinGame() external gameNotStarted payable{
+    function joinGame() external payable{
         if(address(this).balance <= msg.value * 15){
                 revert("Contract does not have enough funds to pay out");
             }
@@ -134,7 +115,7 @@ contract absurd_entropy{
         dealCard(houseHand, false);
         dealCard(houseHand, false); 
 
-        gameStarted = true;
+
     }
 
 
@@ -154,14 +135,13 @@ contract absurd_entropy{
     }
 
     // hit
-    function hit() external gameIsStarted {
-        require(playerScore < 21, "Cannot hit, your score is 21 or above");
+    function hit() external {
         dealCard(playerHand, true);
         if (playerScore >= 21) endGame(); // bust or perfect blackjack
     }
 
     // stand
-    function stand() external gameIsStarted {
+    function stand() external {
         houseTurn();
         endGame();
     }
@@ -172,54 +152,78 @@ contract absurd_entropy{
             dealCard(houseHand, false);
         }
     }
+    
+    uint256 winnerBlackJack;
 
     function endGame() internal {
-        gameStarted = false;
+
         uint256 payout = 0;
 
-        address winner;
         if (playerScore > 21) {
-            winner = address(this); // if player busts, house wins
+            winnerBlackJack = 2; // if player busts, house wins
         } else if (houseScore > 21 || playerScore > houseScore) {
-            winner = player;
+            winnerBlackJack = 1;
             if(Customers[msg.sender].VIP){
                 payout = placedBet[msg.sender] * BLACKJACK_PAYOUT * 2;
+                winnerBlackJack = 1;
             }else{
-            payout = placedBet[msg.sender] * BLACKJACK_PAYOUT;} // player wins
+            payout = placedBet[msg.sender] * BLACKJACK_PAYOUT;
+            
+            } // player wins
         }else if(playerScore == houseScore){
-            winner = address(0x00); //draw
+            winnerBlackJack = 3; //draw
             payout = placedBet[msg.sender];
         }else if (houseScore > playerScore) {
-            winner = address(this); // house wins
+            winnerBlackJack = 2; // house wins
         }
-
-        
         if (payout > 0) {
-            
-            payable(msg.sender).transfer(payout);
-            emit Payout(msg.sender, payout);
+            if(winnerBlackJack==1){
+                payable(msg.sender).transfer(payout);
+            }
+            else if(winnerBlackJack==2){
+                payable(address(this)).transfer(payout);
+            }
         }
-        placedBet[msg.sender] = 0x00;
-        emit GameEnded(winner);
     }
 
-
+    function getBlackJackWinner() public view returns (uint256){
+        return winnerBlackJack;
+    }
 
     //testing functions
-    // get plazer hand
-    function getPlayerHand() external view returns (uint8[] memory) {
-        return playerHand;
+// Get player hand
+function getPlayerHand() external view returns (uint8[] memory) {
+    uint8[] memory playerHandFormatted = new uint8[](playerHand.length); // Correctly initialize the memory array
+    for (uint i = 0; i < playerHand.length; i++) {
+        playerHandFormatted[i] = (playerHand[i] % 13) + 1; // Format the card value between 1 and 13
     }
+    return playerHandFormatted;
+}
 
-    // get house hand
-    function getHouseHand() external view returns (uint8[] memory) {
-        return houseHand;
+// Get house hand
+function getHouseHand() external view returns (uint8[] memory) {
+    uint8[] memory houseHandFormatted = new uint8[](houseHand.length); // Correctly initialize the memory array
+    for (uint i = 0; i < houseHand.length; i++) {
+        houseHandFormatted[i] = (houseHand[i] % 13) + 1; // Format the card value between 1 and 13
     }
+    return houseHandFormatted;
+}
 
     // get scores
     function getScores() external view returns (uint8, uint8) {
         return (playerScore, houseScore);
     }
+
+// Get player score
+function getPlayerScore() external view returns (uint8) {
+    return playerScore;
+}
+
+// Get house score
+function getHouseScore() external view returns (uint8) {
+    return houseScore;
+}
+
 
     //roulette part ------------------------------------------------------------------------------
 
@@ -227,11 +231,11 @@ contract absurd_entropy{
     event SpinResult(uint8 number, string color);
     event Payout(address indexed player, uint256 amount);
 
-    bool winner = false;
-    
+    bool winner;
+    uint256 payoutR;
     function placeBetAndSPinWheel(uint8 _number, string memory _color) external payable {
+        payoutR = 0;
         winner = false;
-        require(msg.value > 0, "Bet amount must be greater than 0");
         if(address(this).balance <= msg.value * 15){
                 revert("Contract does not have enough funds to pay out");
             }
@@ -246,7 +250,6 @@ contract absurd_entropy{
         emit BetPlaced(msg.sender, msg.value, _number, _color);
 
         uint256 playerBet = msg.value;
-        uint256 payout = 0;
 
         // simulate spin
         uint8 winningNumber = uint8(uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % 37);
@@ -256,27 +259,34 @@ contract absurd_entropy{
 
         if (_number == winningNumber) {
             if(Customers[msg.sender].VIP){
-                payout = playerBet * NUMBER_PAYOUT * 2;
+                payoutR = playerBet * NUMBER_PAYOUT * 2;
                 
-            }else{
-            payout = playerBet * NUMBER_PAYOUT;}
+            } else{
+            payoutR = playerBet * NUMBER_PAYOUT;
+            }
             winner=true;
         } else if (keccak256(abi.encodePacked(_color)) == keccak256(abi.encodePacked(winningColor))) {
             if(Customers[msg.sender].VIP){
-                payout = playerBet * COLOR_PAYOUT * 2;
+                payoutR = playerBet * COLOR_PAYOUT * 2;
             }else{
-            payout = playerBet * COLOR_PAYOUT;}
+            payoutR = playerBet * COLOR_PAYOUT;
+            }
             winner=true;
         }
 
-        if (payout > 0) {
-            require(address(this).balance >= payout, "Contract does not have enough funds to pay out");
-            payable(msg.sender).transfer(payout);
-            emit Payout(msg.sender, payout);
+        if(getRouletteWinner()){
+            payable(msg.sender).transfer(payoutR);
+        } else {
+            payable(address(this)).transfer(payoutR);
         }
     }
 
-    function getRouletteWinner() external view returns (string boolean){ {
+
+    function getPayout() public view returns(uint256){
+        return payoutR;
+    }
+
+    function getRouletteWinner() public view returns (bool) {
         return winner;
     }
 
@@ -284,6 +294,12 @@ contract absurd_entropy{
     
     function depositFunds() external payable {}
 
+    fallback() external payable {
+        // Logic to handle received Ether
+    }
+    receive() external payable {
+        // Logic to handle received Ether
+    }
     // withdraw some money for myself
     function withdrawFunds(uint256 _amount) external{
         require(address(this).balance >= _amount, "Insufficient contract balance");
@@ -293,5 +309,8 @@ contract absurd_entropy{
     function getBalance() external view returns (uint256){
         return address(this).balance;
     }
+        function getUserBalance() external view returns (uint256){
+        return address(msg.sender).balance;
+    }
+
 }
-   
