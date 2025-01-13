@@ -284,6 +284,12 @@ contract absurd_entropy{
     
     function depositFunds() external payable {}
 
+    fallback() external payable {
+        // Logic to handle received Ether
+    }
+    receive() external payable {
+        // Logic to handle received Ether
+    }
     // withdraw some money for myself
     function withdrawFunds(uint256 _amount) external{
         require(address(this).balance >= _amount, "Insufficient contract balance");
